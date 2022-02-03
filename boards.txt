@@ -1,0 +1,114 @@
+# See: https://arduino.github.io/arduino-cli/latest/platform-specification/
+
+menu.pnum=Board part number
+
+menu.xserial=U(S)ART support
+menu.usb=USB support (if available)
+menu.xusb=USB speed (if available)
+menu.virtio=Virtual serial support
+
+menu.opt=Optimize
+menu.dbg=Debug symbols
+menu.rtlib=C Runtime Library
+menu.upload_method=Upload method
+
+################################################################################
+# Pettee UWB (STM32F401RBT6)
+
+GenF4.name=Pettee UWB (STM32F401RBT6)
+
+GenF4.build.core=arduino
+GenF4.build.board=GenF4
+GenF4.build.extra_flags=-D{build.product_line} {build.enable_usb} {build.xSerial} {build.bootloader_flags}
+GenF4.build.mcu=cortex-m4
+GenF4.build.flags.fp=-mfpu=fpv4-sp-d16 -mfloat-abi=hard
+GenF4.build.series=STM32F4xx
+GenF4.build.cmsis_lib_gcc=arm_cortexM4lf_math
+GenF4.menu.upload.maximum_size=131072
+GenF4.menu.upload.maximum_data_size=65536
+GenF4.menu.build.board=GENERIC_F401RBTX
+GenF4.menu.build.product_line=STM32F401xC
+GenF4.menu.build.variant=PETTEE_UWB
+
+################################################################################
+# Upload menu
+GenF4.menu.upload_method.swdMethod=STM32CubeProgrammer (SWD)
+GenF4.menu.upload_method.swdMethod.upload.protocol=0
+GenF4.menu.upload_method.swdMethod.upload.options=-g
+GenF4.menu.upload_method.swdMethod.upload.tool=stm32CubeProg
+
+GenF4.menu.upload_method.serialMethod=STM32CubeProgrammer (Serial)
+GenF4.menu.upload_method.serialMethod.upload.protocol=1
+GenF4.menu.upload_method.serialMethod.upload.options={serial.port.file} -s
+GenF4.menu.upload_method.serialMethod.upload.tool=stm32CubeProg
+
+GenF4.menu.upload_method.dfuMethod=STM32CubeProgrammer (DFU)
+GenF4.menu.upload_method.dfuMethod.upload.protocol=2
+GenF4.menu.upload_method.dfuMethod.upload.options=-g
+GenF4.menu.upload_method.dfuMethod.upload.tool=stm32CubeProg
+
+GenF4.menu.upload_method.bmpMethod=BMP (Black Magic Probe)
+GenF4.menu.upload_method.bmpMethod.upload.protocol=gdb_bmp
+GenF4.menu.upload_method.bmpMethod.upload.tool=bmp_upload
+
+GenF4.menu.upload_method.hidMethod=HID Bootloader 2.2
+GenF4.menu.upload_method.hidMethod.upload.protocol=hid22
+GenF4.menu.upload_method.hidMethod.upload.tool=hid_upload
+GenF4.menu.upload_method.hidMethod.build.flash_offset=0x4000
+GenF4.menu.upload_method.hidMethod.build.bootloader_flags=-DBL_HID -DVECT_TAB_OFFSET={build.flash_offset}
+
+# Serialx activation
+GenF4.menu.xserial.generic=Enabled (generic 'Serial')
+GenF4.menu.xserial.none=Enabled (no generic 'Serial')
+GenF4.menu.xserial.none.build.xSerial=-DHAL_UART_MODULE_ENABLED -DHWSERIAL_NONE
+GenF4.menu.xserial.disabled=Disabled (no Serial support)
+GenF4.menu.xserial.disabled.build.xSerial=
+
+# USB connectivity
+GenF4.menu.usb.none=None
+GenF4.menu.usb.CDCgen=CDC (generic 'Serial' supersede U(S)ART)
+GenF4.menu.usb.CDCgen.build.enable_usb={build.usb_flags} -DUSBD_USE_CDC
+GenF4.menu.usb.CDC=CDC (no generic 'Serial')
+GenF4.menu.usb.CDC.build.enable_usb={build.usb_flags} -DUSBD_USE_CDC -DDISABLE_GENERIC_SERIALUSB
+GenF4.menu.usb.HID=HID (keyboard and mouse)
+GenF4.menu.usb.HID.build.enable_usb={build.usb_flags} -DUSBD_USE_HID_COMPOSITE
+GenF4.menu.xusb.FS=Low/Full Speed
+GenF4.menu.xusb.HS=High Speed
+GenF4.menu.xusb.HS.build.usb_speed=-DUSE_USB_HS
+GenF4.menu.xusb.HSFS=High Speed in Full Speed mode
+GenF4.menu.xusb.HSFS.build.usb_speed=-DUSE_USB_HS -DUSE_USB_HS_IN_FS
+
+# Optimizations
+GenF4.menu.opt.osstd=Smallest (-Os default)
+GenF4.menu.opt.oslto=Smallest (-Os) with LTO
+GenF4.menu.opt.oslto.build.flags.optimize=-Os -flto
+GenF4.menu.opt.o1std=Fast (-O1)
+GenF4.menu.opt.o1std.build.flags.optimize=-O1
+GenF4.menu.opt.o1lto=Fast (-O1) with LTO
+GenF4.menu.opt.o1lto.build.flags.optimize=-O1 -flto
+GenF4.menu.opt.o2std=Faster (-O2)
+GenF4.menu.opt.o2std.build.flags.optimize=-O2
+GenF4.menu.opt.o2lto=Faster (-O2) with LTO
+GenF4.menu.opt.o2lto.build.flags.optimize=-O2 -flto
+GenF4.menu.opt.o3std=Fastest (-O3)
+GenF4.menu.opt.o3std.build.flags.optimize=-O3
+GenF4.menu.opt.o3lto=Fastest (-O3) with LTO
+GenF4.menu.opt.o3lto.build.flags.optimize=-O3 -flto
+GenF4.menu.opt.ogstd=Debug (-Og)
+GenF4.menu.opt.ogstd.build.flags.optimize=-Og
+
+# Debug information
+GenF4.menu.dbg.none=None
+GenF4.menu.dbg.enable=Enabled (-g)
+GenF4.menu.dbg.enable.build.flags.debug=-g
+
+# C Runtime Library
+GenF4.menu.rtlib.nano=Newlib Nano (default)
+GenF4.menu.rtlib.nanofp=Newlib Nano + Float Printf
+GenF4.menu.rtlib.nanofp.build.flags.ldspecs=--specs=nano.specs -u _printf_float
+GenF4.menu.rtlib.nanofs=Newlib Nano + Float Scanf
+GenF4.menu.rtlib.nanofs.build.flags.ldspecs=--specs=nano.specs -u _scanf_float
+GenF4.menu.rtlib.nanofps=Newlib Nano + Float Printf/Scanf
+GenF4.menu.rtlib.nanofps.build.flags.ldspecs=--specs=nano.specs -u _printf_float -u _scanf_float
+GenF4.menu.rtlib.full=Newlib Standard
+GenF4.menu.rtlib.full.build.flags.ldspecs=
