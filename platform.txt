@@ -5,7 +5,7 @@
 # https://arduino.github.io/arduino-cli/latest/platform-specification/
 
 name=Pettee UWB Arduino Core (STM32F401RBT6)
-version=1.0.0
+version=0.9.9
 
 # STM compile variables
 # ----------------------

@@ -1,5 +1,3 @@
-# See: https://arduino.github.io/arduino-cli/latest/platform-specification/
-
 menu.pnum=Board part number
 
 menu.xserial=U(S)ART support
@@ -28,7 +26,7 @@ GenF4.menu.upload.maximum_size=131072
 GenF4.menu.upload.maximum_data_size=65536
 GenF4.menu.build.board=GENERIC_F401RBTX
 GenF4.menu.build.product_line=STM32F401xC
-GenF4.menu.build.variant=PETTEE_UWB
+GenF4.menu.build.variant=STM32F4xx/F401R(B-C-D-E)T
 
 ################################################################################
 # Upload menu
