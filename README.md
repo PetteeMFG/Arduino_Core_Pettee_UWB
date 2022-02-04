@@ -1,4 +1,4 @@
-# Arduino Core support for Pettee UWB Board
+# Arduino Core Support for Pettee UWB Board
 ## Installing using Boards Manager
 This is the preferred and easiest way to install Arduino Core support for Pettee UWB Board
 
@@ -13,3 +13,20 @@ To start the installation process using the Boards Managaer, follow these steps:
 - Open Boards Manager from Tools > Board menu and install PetteeMFG Boards platform (and do not forget to select your PetteeMFG board from Tools > Board menu after installation).
 
 - Restart Arduino IDE.
+
+## Programming Pettee UWB Board
+In order to program the STM32F401RBT6 microcontroller on the Pettee UWB Board an ST-Link V2 needs to be used to connect your computer and the board. You must make the following connections between the ST-Link V2 and the Pettee UWB board in order for SWD JTAG programming or debugging to take place.
+
+	ST-Link V2 to Pettee UWB Board
+
+	3.3V -> 3.3V
+
+	IO ---> SWDIO (PA13)
+
+	CLK --> SWCLK (PA14)
+
+	RST --> RESET (NRST)
+
+	GND --> GND
+
+![Pettee UWB Board Pinout Diagram](https://i.imgur.com/zdrW76N.png)
