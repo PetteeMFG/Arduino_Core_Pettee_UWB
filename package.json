@@ -1,6 +1,6 @@
 {
-    "name": "framework-petteeuwb",
-    "description": "Pettee UWB (STM32F401RBT6) Arduino Core",
+    "name": "framework-petteemfg",
+    "description": "PetteeMFG Boards Core",
     "version": "1.0.0",
     "url": "https://github.com/PetteeMFG/Arduino_Core_Pettee_UWB"
 }
