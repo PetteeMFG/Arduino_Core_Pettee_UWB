@@ -6,7 +6,9 @@ To start the installation process using the Boards Managaer, follow these steps:
 
 - Install the current upstream Arduino IDE at the 1.8 level or later. The current version is at the [arduino.cc](https://www.arduino.cc/en/software "arduino.cc") website.
 
-- Start Arduino and open the Preferences window and enter the release link above into Additional Board Manager URLs field. You can add multiple URLs, separating them with commas.
+- Start Arduino and open the Preferences window and enter the release link below into Additional Board Manager URLs field. You can add multiple URLs, separating them with commas.
+
+		https://raw.githubusercontent.com/PetteeMFG/Pettee_UWB_Package/main/package_petteeuwb_index.json
 
 	![Arduino Preferences Window](https://docs.espressif.com/projects/arduino-esp32/en/latest/_images/install_guide_preferences.png)
 
