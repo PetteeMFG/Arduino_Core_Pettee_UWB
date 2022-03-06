@@ -1,0 +1,34 @@
+################################################################################
+# Syntax Coloring Map for library InputDebounce
+################################################################################
+
+################################################################################
+# Datatypes (KEYWORD1)
+################################################################################
+
+InputDebounce	KEYWORD1
+
+################################################################################
+# Methods and Functions (KEYWORD2)
+################################################################################
+
+setup	KEYWORD2
+process	KEYWORD2
+getPinIn	KEYWORD2
+getDebounceDelay	KEYWORD2
+getPinInMode	KEYWORD2
+getPressedDurationMode	KEYWORD2
+getSwitchType	KEYWORD2
+isEnabled	KEYWORD2
+isPressed	KEYWORD2
+isReleased	KEYWORD2
+getStatePressedCount	KEYWORD2
+getCurrentPressedDuration	KEYWORD2
+getLastPressedDuration	KEYWORD2
+registerCallbacks	KEYWORD2
+
+################################################################################
+# Constants (LITERAL1)
+################################################################################
+
+DEFAULT_INPUT_DEBOUNCE_DELAY	LITERAL1

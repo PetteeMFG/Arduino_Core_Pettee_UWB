@@ -1,0 +1,14 @@
+{
+    "name": "InputDebounce",
+    "keywords": "debounce, button, switch, signal, input, output",
+    "description": "Simple polling input debounce Arduino library. Used for push-button like switches. Delivers input value (state) after it has been stable (not flickering) for longer than the debounce period, and delivers continuous or single-shot pressed-on time duration [ms].",
+    "repository":
+    {
+      "type": "git",
+      "url": "https://github.com/Mokolea/InputDebounce.git"
+    },
+    "version": "1.6.0",
+    "license": "Apache-2.0",
+    "frameworks": "arduino",
+    "platforms": "*"
+}
