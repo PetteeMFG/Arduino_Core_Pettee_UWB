@@ -9,12 +9,12 @@
 #include <DW1000Ng.hpp>
 
 // connection pins
-const uint8_t PIN_RST = 9; // reset pin
-const uint8_t PIN_IRQ = 2; // irq pin
-const uint8_t PIN_SS = SS; // spi select pin
+const uint8_t PIN_RST = PC4;
+const uint8_t PIN_IRQ = PB0;
+const uint8_t PIN_SS = PB12;
 
 // data to send
-byte data[] = { 0xC5, 0, 'D', 'E', 'C', 'A', 'W', 'A', 'V', 'E', 0, 0 };
+byte data[] = {0xC5, 0, 'D', 'E', 'C', 'A', 'W', 'A', 'V', 'E', 0, 0};
 
 device_configuration_t POWERTEST_CONFIG = {
     false,
@@ -27,11 +27,10 @@ device_configuration_t POWERTEST_CONFIG = {
     DataRate::RATE_850KBPS,
     PulseFrequency::FREQ_16MHZ,
     PreambleLength::LEN_256,
-    PreambleCode::CODE_3
-};
+    PreambleCode::CODE_3};
 
-
-void setup() {
+void setup()
+{
     // DEBUG monitoring
     Serial.begin(115200);
     Serial.println(F("### DW1000Ng-transmit-spectrum-power-test ###"));
@@ -48,7 +47,7 @@ void setup() {
 
     Serial.println(F("Committed configuration ..."));
     Serial.println(F("Transmitting for calibration...."));
-    
+
     DW1000Ng::enableTransmitPowerSpectrumTestMode(124800); /* Approx 1ms long transmissions */
     DW1000Ng::setTransmitData(data, sizeof(data));
     DW1000Ng::startTransmit();
@@ -60,6 +59,6 @@ void setup() {
     DW1000Ng::softwareReset();
 }
 
-void loop() {
-    
+void loop()
+{
 }

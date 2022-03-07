@@ -57,9 +57,9 @@
 #include <DW1000NgRanging.hpp>
 
 // connection pins
-const uint8_t PIN_RST = 9; // reset pin
-const uint8_t PIN_IRQ = 2; // irq pin
-const uint8_t PIN_SS = SS; // spi select pin
+const uint8_t PIN_RST = PC4;
+const uint8_t PIN_IRQ = PB0;
+const uint8_t PIN_SS = PB12;
 
 // messages used in the ranging protocol
 // TODO replace by enum

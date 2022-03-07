@@ -1,18 +1,18 @@
 /*
  * MIT License
- * 
+ *
  * Copyright (c) 2018 Michele Biondi, Andrea Salvatori
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -20,7 +20,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
-*/
+ */
 
 /*
  * Copyright (c) 2015 by Thomas Trojer <thomas@trojer.net>
@@ -57,9 +57,9 @@
 #include <DW1000NgConstants.hpp>
 
 // connection pins
-const uint8_t PIN_RST = 9; // reset pin
-const uint8_t PIN_IRQ = 2; // irq pin
-const uint8_t PIN_SS = SS; // spi select pin
+const uint8_t PIN_RST = PC4;
+const uint8_t PIN_IRQ = PB0;
+const uint8_t PIN_SS = PB12;
 
 // messages used in the ranging protocol
 // TODO replace by enum
@@ -97,18 +97,17 @@ device_configuration_t DEFAULT_CONFIG = {
     DataRate::RATE_850KBPS,
     PulseFrequency::FREQ_16MHZ,
     PreambleLength::LEN_256,
-    PreambleCode::CODE_3
-};
+    PreambleCode::CODE_3};
 
 interrupt_configuration_t DEFAULT_INTERRUPT_CONFIG = {
     true,
     true,
     true,
     false,
-    true
-};
+    true};
 
-void setup() {
+void setup()
+{
     // DEBUG monitoring
     Serial.begin(115200);
     Serial.println(F("### DW1000Ng-arduino-ranging-tag ###"));
@@ -117,23 +116,27 @@ void setup() {
     Serial.println("DW1000Ng initialized ...");
     // general configuration
     DW1000Ng::applyConfiguration(DEFAULT_CONFIG);
-	DW1000Ng::applyInterruptConfiguration(DEFAULT_INTERRUPT_CONFIG);
+    DW1000Ng::applyInterruptConfiguration(DEFAULT_INTERRUPT_CONFIG);
 
     DW1000Ng::setNetworkId(10);
-    
+
     DW1000Ng::setAntennaDelay(16436);
-    
+
     Serial.println(F("Committed configuration ..."));
     // DEBUG chip info and registers pretty printed
     char msg[128];
     DW1000Ng::getPrintableDeviceIdentifier(msg);
-    Serial.print("Device ID: "); Serial.println(msg);
+    Serial.print("Device ID: ");
+    Serial.println(msg);
     DW1000Ng::getPrintableExtendedUniqueIdentifier(msg);
-    Serial.print("Unique ID: "); Serial.println(msg);
+    Serial.print("Unique ID: ");
+    Serial.println(msg);
     DW1000Ng::getPrintableNetworkIdAndShortAddress(msg);
-    Serial.print("Network ID & Device Address: "); Serial.println(msg);
+    Serial.print("Network ID & Device Address: ");
+    Serial.println(msg);
     DW1000Ng::getPrintableDeviceMode(msg);
-    Serial.print("Device mode: "); Serial.println(msg);
+    Serial.print("Device mode: ");
+    Serial.println(msg);
     // attach callback for (successfully) sent and received messages
     DW1000Ng::attachSentHandler(handleSent);
     DW1000Ng::attachReceivedHandler(handleReceived);
@@ -142,12 +145,14 @@ void setup() {
     noteActivity();
 }
 
-void noteActivity() {
+void noteActivity()
+{
     // update activity timestamp, so that we do not reach "resetPeriod"
     lastActivity = millis();
 }
 
-void resetInactive() {
+void resetInactive()
+{
     // tag sends POLL and listens for POLL_ACK
     expectedMsgId = POLL_ACK;
     DW1000Ng::forceTRxOff();
@@ -155,30 +160,34 @@ void resetInactive() {
     noteActivity();
 }
 
-void handleSent() {
+void handleSent()
+{
     // status change on sent success
     sentAck = true;
 }
 
-void handleReceived() {
+void handleReceived()
+{
     // status change on received success
     receivedAck = true;
 }
 
-void transmitPoll() {
+void transmitPoll()
+{
     data[0] = POLL;
     DW1000Ng::setTransmitData(data, LEN_DATA);
     DW1000Ng::startTransmit();
 }
 
-void transmitRange() {
+void transmitRange()
+{
     data[0] = RANGE;
 
     /* Calculation of future time */
     byte futureTimeBytes[LENGTH_TIMESTAMP];
 
-	timeRangeSent = DW1000Ng::getSystemTimestamp();
-	timeRangeSent += DW1000NgTime::microsecondsToUWBTime(replyDelayTimeUS);
+    timeRangeSent = DW1000Ng::getSystemTimestamp();
+    timeRangeSent += DW1000NgTime::microsecondsToUWBTime(replyDelayTimeUS);
     DW1000NgUtils::writeValueToBytes(futureTimeBytes, timeRangeSent, LENGTH_TIMESTAMP);
     DW1000Ng::setDelayedTRX(futureTimeBytes);
     timeRangeSent += DW1000Ng::getTxAntennaDelay();
@@ -188,47 +197,58 @@ void transmitRange() {
     DW1000NgUtils::writeValueToBytes(data + 11, timeRangeSent, LENGTH_TIMESTAMP);
     DW1000Ng::setTransmitData(data, LEN_DATA);
     DW1000Ng::startTransmit(TransmitMode::DELAYED);
-    //Serial.print("Expect RANGE to be sent @ "); Serial.println(timeRangeSent.getAsFloat());
+    // Serial.print("Expect RANGE to be sent @ "); Serial.println(timeRangeSent.getAsFloat());
 }
 
-void loop() {
-    if (!sentAck && !receivedAck) {
+void loop()
+{
+    if (!sentAck && !receivedAck)
+    {
         // check if inactive
-        if (millis() - lastActivity > resetPeriod) {
+        if (millis() - lastActivity > resetPeriod)
+        {
             resetInactive();
         }
         return;
     }
     // continue on any success confirmation
-    if (sentAck) {
+    if (sentAck)
+    {
         sentAck = false;
         DW1000Ng::startReceive();
     }
-    if (receivedAck) {
+    if (receivedAck)
+    {
         receivedAck = false;
         // get message and parse
         DW1000Ng::getReceivedData(data, LEN_DATA);
         byte msgId = data[0];
-        if (msgId != expectedMsgId) {
+        if (msgId != expectedMsgId)
+        {
             // unexpected message, start over again
-            //Serial.print("Received wrong message # "); Serial.println(msgId);
+            // Serial.print("Received wrong message # "); Serial.println(msgId);
             expectedMsgId = POLL_ACK;
             transmitPoll();
             return;
         }
-        if (msgId == POLL_ACK) {
+        if (msgId == POLL_ACK)
+        {
             timePollSent = DW1000Ng::getTransmitTimestamp();
             timePollAckReceived = DW1000Ng::getReceiveTimestamp();
             expectedMsgId = RANGE_REPORT;
             transmitRange();
             noteActivity();
-        } else if (msgId == RANGE_REPORT) {
+        }
+        else if (msgId == RANGE_REPORT)
+        {
             expectedMsgId = POLL_ACK;
             float curRange;
             memcpy(&curRange, data + 1, 4);
             transmitPoll();
             noteActivity();
-        } else if (msgId == RANGE_FAILED) {
+        }
+        else if (msgId == RANGE_FAILED)
+        {
             expectedMsgId = POLL_ACK;
             transmitPoll();
             noteActivity();

@@ -1,18 +1,18 @@
 /*
  * MIT License
- * 
+ *
  * Copyright (c) 2018 Michele Biondi, Andrea Salvatori
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all
  * copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -20,7 +20,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
-*/
+ */
 
 /*
  * Copyright (c) 2015 by Thomas Trojer <thomas@trojer.net>
@@ -57,9 +57,9 @@
 #include <DW1000NgRanging.hpp>
 
 // connection pins
-const uint8_t PIN_RST = 9; // reset pin
-const uint8_t PIN_IRQ = 2; // irq pin
-const uint8_t PIN_SS = SS; // spi select pin
+const uint8_t PIN_RST = PC4;
+const uint8_t PIN_IRQ = PB0;
+const uint8_t PIN_SS = PB12;
 
 // messages used in the ranging protocol
 // TODO replace by enum
@@ -109,18 +109,17 @@ device_configuration_t DEFAULT_CONFIG = {
     DataRate::RATE_850KBPS,
     PulseFrequency::FREQ_16MHZ,
     PreambleLength::LEN_256,
-    PreambleCode::CODE_3
-};
+    PreambleCode::CODE_3};
 
 interrupt_configuration_t DEFAULT_INTERRUPT_CONFIG = {
     true,
     true,
     true,
     false,
-    true
-};
+    true};
 
-void setup() {
+void setup()
+{
     // DEBUG monitoring
     Serial.begin(115200);
     delay(1000);
@@ -130,63 +129,73 @@ void setup() {
     Serial.println(F("DW1000Ng initialized ..."));
     // general configuration
     DW1000Ng::applyConfiguration(DEFAULT_CONFIG);
-	DW1000Ng::applyInterruptConfiguration(DEFAULT_INTERRUPT_CONFIG);
+    DW1000Ng::applyInterruptConfiguration(DEFAULT_INTERRUPT_CONFIG);
 
     DW1000Ng::setDeviceAddress(1);
-	
+
     DW1000Ng::setAntennaDelay(16436);
-    
+
     Serial.println(F("Committed configuration ..."));
     // DEBUG chip info and registers pretty printed
     char msg[128];
     DW1000Ng::getPrintableDeviceIdentifier(msg);
-    Serial.print("Device ID: "); Serial.println(msg);
+    Serial.print("Device ID: ");
+    Serial.println(msg);
     DW1000Ng::getPrintableExtendedUniqueIdentifier(msg);
-    Serial.print("Unique ID: "); Serial.println(msg);
+    Serial.print("Unique ID: ");
+    Serial.println(msg);
     DW1000Ng::getPrintableNetworkIdAndShortAddress(msg);
-    Serial.print("Network ID & Device Address: "); Serial.println(msg);
+    Serial.print("Network ID & Device Address: ");
+    Serial.println(msg);
     DW1000Ng::getPrintableDeviceMode(msg);
-    Serial.print("Device mode: "); Serial.println(msg);
+    Serial.print("Device mode: ");
+    Serial.println(msg);
     // attach callback for (successfully) sent and received messages
     DW1000Ng::attachSentHandler(handleSent);
     DW1000Ng::attachReceivedHandler(handleReceived);
     // anchor starts in receiving mode, awaiting a ranging poll message
-   
+
     receiver();
     noteActivity();
     // for first time ranging frequency computation
     rangingCountPeriod = millis();
 }
 
-void noteActivity() {
+void noteActivity()
+{
     // update activity timestamp, so that we do not reach "resetPeriod"
     lastActivity = millis();
 }
 
-void resetInactive() {
+void resetInactive()
+{
     // anchor listens for POLL
     expectedMsgId = POLL;
     receiver();
     noteActivity();
 }
 
-void handleSent() {
+void handleSent()
+{
     // status change on sent success
     sentAck = true;
 }
 
-void handleReceived() {
+void handleReceived()
+{
     // status change on received success
     receivedAck = true;
 }
 
-void transmitPollAck() {
+void transmitPollAck()
+{
     data[0] = POLL_ACK;
     DW1000Ng::setTransmitData(data, LEN_DATA);
     DW1000Ng::startTransmit();
 }
 
-void transmitRangeReport(float curRange) {
+void transmitRangeReport(float curRange)
+{
     data[0] = RANGE_REPORT;
     // write final ranging result
     memcpy(data + 1, &curRange, 4);
@@ -194,47 +203,57 @@ void transmitRangeReport(float curRange) {
     DW1000Ng::startTransmit();
 }
 
-void transmitRangeFailed() {
+void transmitRangeFailed()
+{
     data[0] = RANGE_FAILED;
     DW1000Ng::setTransmitData(data, LEN_DATA);
     DW1000Ng::startTransmit();
 }
 
-void receiver() {
+void receiver()
+{
     DW1000Ng::forceTRxOff();
     // so we don't need to restart the receiver manually
     DW1000Ng::startReceive();
 }
 
-void loop() {
+void loop()
+{
     int32_t curMillis = millis();
-    if (!sentAck && !receivedAck) {
+    if (!sentAck && !receivedAck)
+    {
         // check if inactive
-        if (curMillis - lastActivity > resetPeriod) {
+        if (curMillis - lastActivity > resetPeriod)
+        {
             resetInactive();
         }
         return;
     }
     // continue on any success confirmation
-    if (sentAck) {
+    if (sentAck)
+    {
         sentAck = false;
         byte msgId = data[0];
-        if (msgId == POLL_ACK) {
+        if (msgId == POLL_ACK)
+        {
             timePollAckSent = DW1000Ng::getTransmitTimestamp();
             noteActivity();
         }
         DW1000Ng::startReceive();
     }
-    if (receivedAck) {
+    if (receivedAck)
+    {
         receivedAck = false;
         // get message and parse
         DW1000Ng::getReceivedData(data, LEN_DATA);
         byte msgId = data[0];
-        if (msgId != expectedMsgId) {
+        if (msgId != expectedMsgId)
+        {
             // unexpected message, start over again (except if already POLL)
             protocolFailed = true;
         }
-        if (msgId == POLL) {
+        if (msgId == POLL)
+        {
             // on POLL we (re-)start, so no protocol failure
             protocolFailed = false;
             timePollReceived = DW1000Ng::getReceiveTimestamp();
@@ -242,40 +261,50 @@ void loop() {
             transmitPollAck();
             noteActivity();
         }
-        else if (msgId == RANGE) {
+        else if (msgId == RANGE)
+        {
             timeRangeReceived = DW1000Ng::getReceiveTimestamp();
             expectedMsgId = POLL;
-            if (!protocolFailed) {
+            if (!protocolFailed)
+            {
                 timePollSent = DW1000NgUtils::bytesAsValue(data + 1, LENGTH_TIMESTAMP);
                 timePollAckReceived = DW1000NgUtils::bytesAsValue(data + 6, LENGTH_TIMESTAMP);
                 timeRangeSent = DW1000NgUtils::bytesAsValue(data + 11, LENGTH_TIMESTAMP);
                 // (re-)compute range as two-way ranging is done
                 double distance = DW1000NgRanging::computeRangeAsymmetric(timePollSent,
-                                                            timePollReceived, 
-                                                            timePollAckSent, 
-                                                            timePollAckReceived, 
-                                                            timeRangeSent, 
-                                                            timeRangeReceived);
+                                                                          timePollReceived,
+                                                                          timePollAckSent,
+                                                                          timePollAckReceived,
+                                                                          timeRangeSent,
+                                                                          timeRangeReceived);
                 /* Apply simple bias correction */
                 distance = DW1000NgRanging::correctRange(distance);
-                
-                String rangeString = "Range: "; rangeString += distance; rangeString += " m";
-                rangeString += "\t RX power: "; rangeString += DW1000Ng::getReceivePower(); rangeString += " dBm";
-                rangeString += "\t Sampling: "; rangeString += samplingRate; rangeString += " Hz";
+
+                String rangeString = "Range: ";
+                rangeString += distance;
+                rangeString += " m";
+                rangeString += "\t RX power: ";
+                rangeString += DW1000Ng::getReceivePower();
+                rangeString += " dBm";
+                rangeString += "\t Sampling: ";
+                rangeString += samplingRate;
+                rangeString += " Hz";
                 Serial.println(rangeString);
-                //Serial.print("FP power is [dBm]: "); Serial.print(DW1000Ng::getFirstPathPower());
-                //Serial.print("RX power is [dBm]: "); Serial.println(DW1000Ng::getReceivePower());
-                //Serial.print("Receive quality: "); Serial.println(DW1000Ng::getReceiveQuality());
-                // update sampling rate (each second)
+                // Serial.print("FP power is [dBm]: "); Serial.print(DW1000Ng::getFirstPathPower());
+                // Serial.print("RX power is [dBm]: "); Serial.println(DW1000Ng::getReceivePower());
+                // Serial.print("Receive quality: "); Serial.println(DW1000Ng::getReceiveQuality());
+                //  update sampling rate (each second)
                 transmitRangeReport(distance * DISTANCE_OF_RADIO_INV);
                 successRangingCount++;
-                if (curMillis - rangingCountPeriod > 1000) {
+                if (curMillis - rangingCountPeriod > 1000)
+                {
                     samplingRate = (1000.0f * successRangingCount) / (curMillis - rangingCountPeriod);
                     rangingCountPeriod = curMillis;
                     successRangingCount = 0;
                 }
             }
-            else {
+            else
+            {
                 transmitRangeFailed();
             }
 
@@ -283,4 +312,3 @@ void loop() {
         }
     }
 }
-

@@ -18,12 +18,8 @@
 #include <DW1000NgRTLS.hpp>
 
 // connection pins
-#if defined(ESP8266)
-const uint8_t PIN_SS = 15;
-#else
-const uint8_t PIN_RST = 9;
-const uint8_t PIN_SS = SS; // spi select pin
-#endif
+const uint8_t PIN_RST = PC4;
+const uint8_t PIN_SS = PB12;
 
 // Extended Unique Identifier register. 64-bit device identifier. Register file: 0x01
 char EUI[] = "AA:BB:CC:DD:EE:FF:00:03";
@@ -62,12 +58,8 @@ void setup()
     // DEBUG monitoring
     Serial.begin(115200);
     Serial.println(F("### arduino-DW1000Ng-ranging-anchor-C ###"));
-// initialize the driver
-#if defined(ESP8266)
-    DW1000Ng::initializeNoInterrupt(PIN_SS);
-#else
+    // initialize the driver
     DW1000Ng::initializeNoInterrupt(PIN_SS, PIN_RST);
-#endif
     Serial.println(F("DW1000Ng initialized ..."));
     // general configuration
     DW1000Ng::applyConfiguration(DEFAULT_CONFIG);

@@ -49,15 +49,7 @@
 
 #include <DW1000Ng.hpp>
 
-#if defined(ESP8266)
-//const uint8_t PIN_RST = 5; // reset pin
-//const uint8_t PIN_IRQ = 4; // irq pin
-const uint8_t PIN_SS = 15; // spi select pin
-#else
-//const uint8_t PIN_RST = 9; // reset pin
-//const uint8_t PIN_IRQ = 2; // irq pin
-const uint8_t PIN_SS = SS; // spi select pin
-#endif
+const uint8_t PIN_SS = PB12;
 
 // DEBUG packet sent status and count
 volatile unsigned long delaySent = 0;
